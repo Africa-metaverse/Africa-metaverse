@@ -15,3 +15,50 @@
 Africa-metaverse/Africa-metaverse is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
 --->
+
+## Development Setup
+
+1. Install Node.js >= 18
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the dev server:
+
+```bash
+npm run dev
+```
+
+The app will be live on <http://localhost:5173>.
+
+## One-click Deployment
+
+Run the provided script:
+
+```bash
+./scripts/deploy.sh
+```
+
+It installs deps (if necessary), builds the project, and serves the static build on port 5000. Modify the script to deploy to Vercel, Netlify, or any hosting platform.
+
+## Testing
+
+Unit tests are powered by Vitest:
+
+```bash
+npm run test
+```
+
+## Abstract Network Configuration
+
+The dApp is pre-configured for the Abstract mainnet (abs.xyz):
+
+* Chain ID: 2741
+* RPC: <https://api.mainnet.abs.xyz>
+* Explorer: <https://abscan.org>
+
+Wallets such as MetaMask can be connected automatically via Wagmi’s injected connector.
+
+---
