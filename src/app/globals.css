@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --abs-green: #43e97b;
+  --abs-gold: #f8ffae;
+  --abs-blue: #38b6ff;
+  --abs-purple: #a259ff;
+  --abs-dark: #181a20;
+  --abs-glass: rgba(255,255,255,0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body, html {
+  font-family: 'Avenue Mono', 'Roobert', 'Geist', Arial, sans-serif;
+  color: var(--abs-dark);
+  background: var(--abs-dark);
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Avenue Mono', 'Roobert', 'Geist', Arial, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Classic Abstract Background */
+.classic-bg {
+  background: linear-gradient(135deg, var(--abs-gold) 0%, var(--abs-green) 40%, var(--abs-blue) 80%, var(--abs-purple) 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-svg-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glassmorphism */
+.glass {
+  background: var(--abs-glass);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Connect Button */
+.connect-btn {
+  font-family: 'Avenue Mono', 'Roobert', 'Geist', Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 18px;
+  padding: 1rem 2.5rem;
+  margin: 1rem 0.5rem;
+  background: linear-gradient(90deg, var(--abs-green), var(--abs-blue), var(--abs-purple));
+  color: #181a20;
+  box-shadow: 0 4px 24px 0 var(--abs-glass);
+  transition: transform 0.15s cubic-bezier(.4,2,.3,1), box-shadow 0.2s;
+  animation: glow 2.5s infinite alternate;
+}
+.connect-btn:hover {
+  transform: scale(1.08) rotate(-1deg);
+  box-shadow: 0 8px 32px 0 var(--abs-blue);
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 0.4em 1.2em;
+  border-radius: 16px;
+  background: linear-gradient(90deg, var(--abs-green), var(--abs-blue));
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px 0 var(--abs-glass);
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Animated Banner */
+.animated-banner {
+  background: linear-gradient(90deg, var(--abs-gold), var(--abs-green), var(--abs-blue));
+  color: #181a20;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 1.2rem 2rem;
+  border-radius: 18px;
+  margin: 2rem auto 1.5rem auto;
+  text-align: center;
+  box-shadow: 0 4px 24px 0 var(--abs-glass);
+  animation: glow 2.5s infinite alternate;
+}
+
+/* Sparkle effect */
+.sparkle {
+  position: absolute;
+  width: 12px; height: 12px;
+  background: radial-gradient(circle, #fff 0%, var(--abs-gold) 100%);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: float 4s infinite;
+}
+
+/* Keyframes */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px) scale(1.05); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 16px 4px var(--abs-green); }
+  50% { box-shadow: 0 0 32px 8px var(--abs-purple); }
+}
+
+@keyframes grow {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes harvest {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease-in-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #10b981;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+/* Crop growth progress */
+.progress-bar {
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 0.3s ease-in-out;
+}
+
+/* Farm field grid */
+.farm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .farm-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  background: var(--abs-glass);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--abs-blue);
+  border-radius: 8px;
+}

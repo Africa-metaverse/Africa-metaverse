@@ -1,0 +1,347 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Africa Metaverse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(45deg, #f6c83a, #e63946, #2a9d8f, #f6c83a);
+      background-size: 400%;
+      animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn {
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #2a9d8f;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    .spinner.active {
+      display: inline-block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .token {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: url('https://via.placeholder.com/40?text=🌍') no-repeat center;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .token:hover {
+      transform: scale(1.2);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { ethers } = window.ethers;
+
+    const adminWallet = '0x01661103E022CB065cFDD1fB8EDC75c9c6b6234f';
+    const chainId = 2741; // Abstract mainnet chain ID from www.abs.xyz
+    const rpcUrl = 'https://rpc.mainnet.abs.xyz'; // Official RPC URL from www.abs.xyz
+
+    const App = () => {
+      const [provider, setProvider] = useState(null);
+      const [signer, setSigner] = useState(null);
+      const [address, setAddress] = useState('');
+      const [balance, setBalance] = useState('');
+      const [amount, setAmount] = useState('');
+      const [status, setStatus] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [score, setScore] = useState(0);
+      const [tokens, setTokens] = useState([]);
+
+      useEffect(() => {
+        if (window.ethereum) {
+          const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+          setProvider(web3Provider);
+          web3Provider.getNetwork().then(network => {
+            if (network.chainId !== chainId) {
+              window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: `0x${chainId.toString(16)}` }],
+              }).catch(() => {
+                window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: `0x${chainId.toString(16)}`,
+                    chainName: 'Abstract Mainnet',
+                    nativeCurrency: {
+                      name: 'Ether',
+                      symbol: 'ETH',
+                      decimals: 18,
+                    },
+                    rpcUrls: [rpcUrl],
+                    blockExplorerUrls: ['https://explorer.mainnet.abs.xyz'],
+                  }],
+                });
+              });
+            }
+          });
+        } else {
+          setStatus('🚫 Please install MetaMask to use Africa Metaverse.');
+        }
+      }, []);
+
+      const connectWallet = async () => {
+        if (!provider) return;
+        setIsLoading(true);
+        try {
+          await provider.send('eth_requestAccounts', []);
+          const network = await provider.getNetwork();
+          if (network.chainId !== chainId) {
+            setStatus('🌍 Please switch to Abstract Mainnet in your wallet.');
+            setIsLoading(false);
+            return;
+          }
+          const signer = provider.getSigner();
+          setSigner(signer);
+          const userAddress = await signer.getAddress();
+          setAddress(userAddress);
+          const userBalance = await provider.getBalance(userAddress);
+          setBalance(ethers.utils.formatEther(userBalance));
+          setStatus('🎉 Wallet connected successfully!');
+        } catch (error) {
+          setStatus(`🚫 Error connecting wallet: ${error.message}`);
+        }
+        setIsLoading(false);
+      };
+
+      const refreshBalance = async () => {
+        if (!provider || !address) return;
+        setIsLoading(true);
+        try {
+          const userBalance = await provider.getBalance(address);
+          setBalance(ethers.utils.formatEther(userBalance));
+          setStatus('🔄 Balance refreshed!');
+        } catch (error) {
+          setStatus(`🚫 Error refreshing balance: ${error.message}`);
+        }
+        setIsLoading(false);
+      };
+
+      const sendEth = async () => {
+        if (!signer || !amount) {
+          setStatus('🚫 Please connect wallet and enter an amount.');
+          return;
+        }
+        if (isNaN(amount) || parseFloat(amount) <= 0) {
+          setStatus('🚫 Invalid amount. Please enter a positive number.');
+          return;
+        }
+        setIsLoading(true);
+        try {
+          const tx = {
+            to: adminWallet,
+            value: ethers.utils.parseEther(amount),
+          };
+          const transaction = await signer.sendTransaction(tx);
+          setStatus(`🚀 Transaction sent: ${transaction.hash}`);
+          await transaction.wait();
+          setStatus('🎉 Transaction confirmed!');
+          const newBalance = await provider.getBalance(address);
+          setBalance(ethers.utils.formatEther(newBalance));
+          setAmount('');
+        } catch (error) {
+          setStatus(`🚫 Error sending ETH: ${error.message}`);
+        }
+        setIsLoading(false);
+      };
+
+      const spawnToken = () => {
+        const maxX = window.innerWidth - 40;
+        const maxY = window.innerHeight - 100; // Adjust for header/footer
+        const newToken = {
+          id: Math.random(),
+          x: Math.random() * maxX,
+          y: Math.random() * maxY,
+        };
+        setTokens(prev => [...prev, newToken]);
+        setTimeout(() => {
+          setTokens(prev => prev.filter(token => token.id !== newToken.id));
+        }, 5000);
+      };
+
+      const collectToken = (id) => {
+        setTokens(prev => prev.filter(token => token.id !== id));
+        setScore(prev => prev + 1);
+      };
+
+      useEffect(() => {
+        if (address) {
+          const interval = setInterval(spawnToken, 3000);
+          return () => clearInterval(interval);
+        }
+      }, [address]);
+
+      return (
+        <div className="flex flex-col min-h-screen font-ubuntu">
+          <header className="glass p-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Africa Metaverse 🌍</h1>
+            <p className="text-sm text-white mt-2">Connect your wallet to play Token Hunt and send ETH on Abstract Mainnet</p>
+          </header>
+          <div className="flex flex-1">
+            <nav className="hidden md:block w-64 glass p-4">
+              <ul className="space-y-4">
+                <li><a href="#home" className="text-white hover:underline">Home</a></li>
+                <li><a href="#game" className="text-white hover:underline">Token Hunt</a></li>
+                <li><a href="#send" className="text-white hover:underline">Send ETH</a></li>
+                <li><a href="https://www.abs.xyz" target="_blank" className="text-white hover:underline">Abstract Mainnet</a></li>
+              </ul>
+            </nav>
+            <main className="flex-1 p-4 md:p-8">
+              {!address ? (
+                <div className="glass rounded-lg p-6">
+                  <button
+                    onClick={connectWallet}
+                    className="btn bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-lg font-bold text-lg w-full md:w-auto"
+                    disabled={isLoading}
+                  >
+                    <span className={isLoading ? 'inline-flex items-center' : ''}>
+                      {isLoading && <span className="spinner active mr-2"></span>}
+                      Connect Wallet
+                    </span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="glass rounded-lg p-6">
+                    <p className="text-white"><strong>Address:</strong> <span className="break-all">{address}</span></p>
+                    <p className="text-white flex items-center">
+                      <strong>Balance:</strong> {balance} ETH
+                      <button
+                        onClick={refreshBalance}
+                        className="btn ml-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm"
+                        disabled={isLoading}
+                      >
+                        🔄
+                      </button>
+                    </p>
+                  </div>
+                  <div className="glass rounded-lg p-6">
+                    <h2 className="text-xl text-white mb-4">Send ETH to Admin</h2>
+                    <input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Amount of ETH to send"
+                      className="glass p-3 rounded-lg w-full text-white placeholder-gray-300 mb-4"
+                      step="0.01"
+                    />
+                    <button
+                      onClick={sendEth}
+                      className="btn bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-lg font-bold text-lg w-full md:w-auto"
+                      disabled={isLoading}
+                    >
+                      <span className={isLoading ? 'inline-flex items-center' : ''}>
+                        {isLoading && <span className="spinner active mr-2"></span>}
+                        Send ETH
+                      </span>
+                    </button>
+                  </div>
+                  <div className="glass rounded-lg p-6">
+                    <h2 className="text-xl text-white mb-4">Token Hunt Game 🌍</h2>
+                    <p className="text-white mb-4">Score: {score}</p>
+                    <p className="text-white mb-4">Click the tokens to collect them!</p>
+                    <div className="relative h-64 bg-gray-800 bg-opacity-20 rounded-lg">
+                      {tokens.map(token => (
+                        <div
+                          key={token.id}
+                          className="token"
+                          style={{ left: `${token.x}px`, top: `${token.y}px` }}
+                          onClick={() => collectToken(token.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {status && (
+                <p className={`mt-4 p-3 rounded-lg text-white ${status.includes('Error') ? 'bg-red-500' : 'bg-green-500'}`}>
+                  {status}
+                </p>
+              )}
+            </main>
+          </div>
+          <footer className="glass p-4 text-center text-white">
+            <p>Powered by <a href="https://www.abs.xyz" target="_blank" className="underline">Abstract Mainnet</a> 🌍</p>
+          </footer>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

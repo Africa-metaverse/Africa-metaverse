@@ -1,0 +1,45 @@
+{
+  "name": "crypto-harvest-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "compile": "npx hardhat compile",
+    "deploy:local": "npx hardhat run scripts/deploy-harvest.js --network localhost",
+    "deploy:abstract": "npx hardhat run scripts/deploy-harvest.js --network abstract",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@rainbow-me/rainbowkit": "^2.0.0",
+    "ethers": "^6.11.1",
+    "framer-motion": "^10.16.16",
+    "lucide-react": "^0.320.0",
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "viem": "^2.7.9",
+    "wagmi": "^2.5.7"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.1",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.21",
+    "dotenv": "^16.4.5",
+    "eslint": "^8",
+    "eslint-config-next": "15.3.5",
+    "hardhat": "^2.22.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5"
+  }
+}
